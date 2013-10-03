@@ -56,7 +56,7 @@ class Checkin < ActiveRecord::Base
           # TODO: もっと目立たせるために別画面を表示するべき？
           #message << I18n.t('item.this_item_is_reserved') + '<br />'
           message << 'item.this_item_is_reserved'
-          self.item.retain(current_user)
+          # self.item.retain(current_user)
         end
       end
 
