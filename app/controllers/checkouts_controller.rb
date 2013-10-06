@@ -223,13 +223,12 @@ class CheckoutsController < ApplicationController
     begin
       params[:user_number] = cryptor.decrypt(base64decode(params[:user_number]))
       params[:item_identifier] = cryptor.decrypt(base64decode(params[:item_identifier]))
-      params[:created_at] = cryptor.decrypt(base64decode(params[:created_at]))
+      params[:checked_at] = cryptor.decrypt(base64decode(params[:created_at]))
     rescue
       logger.error "mismatch decrypt password."
       status = {'code' => 700, 'note' => 'mismatch decrypt password'}
     end
-    #Parameters: {"id"=>"3", "user_number"=>"nakamura", "item_identifier"=>"JX009", "created_at"=>"20121026144222"}
-    if params[:id].blank? || params[:user_number].blank? || params[:item_identifier].blank? || params[:created_at].blank?
+    if params[:id].blank? || params[:user_number].blank? || params[:item_identifier].blank? || params[:checked_at].blank?
       logger.error "invalid parameter error."
       status = {'code' => 800, 'note' => 'invalid parameter error'}
     end
@@ -246,7 +245,7 @@ private
   def batchexec_checkout(params)
     status = {}
 
-    checked_item = {"item_identifier"=>params[:item_identifier], "ignore_restriction"=>"1"}
+    checked_item = {"item_identifier"=>params[:item_identifier], "ignore_restriction"=>"1", "checked_at"=>params[:checked_at]}
     logger.debug "basket create."
     basket = Basket.new
     basket.user_number = params[:user_number]
