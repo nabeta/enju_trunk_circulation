@@ -191,7 +191,7 @@ class CheckinsController < ApplicationController
         cryptor = Cryptor.new(passwd)
         begin
           params[:item_identifier] = cryptor.decrypt(base64decode(params[:item_identifier]))
-          params[:created_at] = cryptor.decrypt(base64decode(params[:created_at]))
+          params[:checked_at] = cryptor.decrypt(base64decode(params[:created_at]))
           params[:created_by] = cryptor.decrypt(base64decode(params[:created_by]))
         rescue
           logger.error "mismatch decrypt password."
@@ -201,14 +201,14 @@ class CheckinsController < ApplicationController
         logger.info "offline_client_crypt_password is empty."
       end
       #Parameters: {"id"=>"3", "item_identifier"=>"JX009", "created_at"=>"20121026144222", "created_by"=>"admin"}
-      if params[:id].blank? || params[:item_identifier].blank? || params[:created_at].blank? || params[:created_by].blank?
+      if params[:id].blank? || params[:item_identifier].blank? || params[:checked_at].blank? || params[:created_by].blank?
         logger.error "invalid parameter error."
         status = {'code' => 800, 'note' => 'invalid parameter error'}
       end
 
       unless crypt_flag
         begin
-          Time.parse params[:created_at]
+          Time.parse params[:checked_at]
         rescue ArgumentError => e
           status = {'code' => 801, 'note' => 'invalid parameter error.'}
         end
@@ -258,7 +258,7 @@ private
 
     logger.debug "checked time set"
     begin
-      checkin.created_at = Time.parse params[:created_at]
+      checkin.checked_at = Time.parse params[:checked_at]
     rescue ArgumentError => e
       logger.debug "invalid created_at"
       status = {'code' => 310, 'note' => 'invalid created_at'}
