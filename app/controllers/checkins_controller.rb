@@ -268,7 +268,6 @@ private
     checkin.item = item
     if checkin.save(:validate => false)
       checkin.item_checkin(librarian, true)
-      logger.info "success checkn"
       status = {'code' => 0}
     else
       rmsg = ""

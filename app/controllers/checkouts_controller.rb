@@ -228,6 +228,7 @@ class CheckoutsController < ApplicationController
           params[:item_identifier] = cryptor.decrypt(base64decode(params[:item_identifier]))
           params[:checked_at] = cryptor.decrypt(base64decode(params[:created_at]))
           params[:created_by] = cryptor.decrypt(base64decode(params[:created_by]))
+          params[:created_at] = nil
         rescue
           logger.error "mismatch decrypt password."
           logger.error $@
@@ -238,6 +239,7 @@ class CheckoutsController < ApplicationController
       end
       #Parameters: {"id"=>"3", "user_number"=>"nakamura", "item_identifier"=>"JX009", "created_at"=>"20121026144222", "created_by"=>"librarian1"}
       if params[:id].blank? || params[:user_number].blank? || params[:item_identifier].blank? || params[:checked_at].blank? || params[:created_by].blank?
+
         logger.error "invalid parameter error."
         status = {'code' => 800, 'note' => 'invalid parameter error'}
       end
@@ -245,7 +247,8 @@ class CheckoutsController < ApplicationController
       unless crypt_flag 
         begin
           Time.parse params[:checked_at]
-        rescue ArgumentError => e 
+        rescue ArgumentError => e
+          logger.error e 
           status = {'code' => 801, 'note' => 'invalid parameter error.'}
         end
       end
@@ -276,18 +279,18 @@ private
       return status
     end
     basket.user = user
-    basket.save
-
+    basket.save!
+    checked_item[:basket_id] = basket.id
     logger.debug "checked item create"
     checked_item = CheckedItem.new(checked_item)
     checked_item.basket = basket
 
     logger.debug "checked time set"
     begin
-      checked_item.created_at = Time.parse params[:created_at]
+      checked_item.created_at = Time.parse params[:checked_at]
     rescue ArgumentError => e
-      logger.debug "invalid created_at"
-      status = {'code' => 310, 'note' => 'invalid created_at'}
+      logger.debug "invalid checked_at"
+      status = {'code' => 310, 'note' => 'invalid checked_at'}
       return status
     end
 
