@@ -42,7 +42,7 @@ class Basket < ActiveRecord::Base
           option = checked_item.item.checkout!(self.user, librarian)
           checkout = Checkout.new(:librarian_id => librarian.id, :item_id => checked_item.item.id, :basket_id => self.id, :user_id => self.user_id, 
                                   :due_date => checked_item.due_date, :available_for_extend => true, :checked_at => checked_item.checked_at)
-          checkout.checkout_renewal_count = option[:extend] + 1 if option.is_a?(Hash)
+          checkout.checkout_renewal_count = option[:extend].to_i + 1 if option.is_a?(Hash)
           checkout.save!
         else
           errors[:base] << I18n.t('activerecord.errors.messages.checked_item.not_available_for_checkout')
